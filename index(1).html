@@ -1,0 +1,707 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Haircut Preview Tool — Mzansi Fade Barbershop</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;900&display=swap" rel="stylesheet">
+<script src="https://cdn.jsdelivr.net/npm/@emailjs/browser@4/dist/email.min.js"></script>
+<style>
+:root{
+  --gold:#c9a84c;
+  --gold-bright:#f0c84a;
+  --gold-dim:rgba(201,168,76,0.18);
+  --gold-border:rgba(201,168,76,0.3);
+  --black:#080808;
+  --black-mid:#111;
+  --black-card:#141414;
+  --white:rgba(255,255,255,0.9);
+  --white-dim:rgba(255,255,255,0.35);
+  --white-faint:rgba(255,255,255,0.08);
+}
+*{margin:0;padding:0;box-sizing:border-box}
+body{background:var(--black);color:var(--white);font-family:'Inter',sans-serif;min-height:100vh}
+
+header{display:flex;align-items:center;gap:16px;padding:20px 28px;border-bottom:1px solid var(--gold-border);background:var(--black)}
+.back-btn{width:34px;height:34px;border-radius:50%;border:1px solid var(--gold-border);background:transparent;color:var(--gold);cursor:pointer;font-size:16px;display:flex;align-items:center;justify-content:center;transition:all 0.2s}
+.back-btn:hover{background:var(--gold-dim)}
+header h1{font-size:20px;font-weight:700;letter-spacing:-0.5px;color:var(--gold-bright)}
+
+.subtitle{padding:14px 28px 0;font-size:13px;color:var(--white-dim);line-height:1.6;max-width:500px}
+
+.main{display:grid;grid-template-columns:420px 1fr;gap:0;height:calc(100vh - 90px)}
+
+/* ── LEFT PANEL ── */
+.left{padding:24px 28px;display:flex;flex-direction:column;gap:18px;overflow-y:auto;border-right:1px solid var(--gold-border);background:var(--black)}
+
+.upload-zone{border:1.5px dashed var(--gold-border);border-radius:16px;height:200px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:10px;cursor:pointer;transition:all 0.2s;position:relative;overflow:hidden;background:var(--gold-dim)}
+.upload-zone:hover{border-color:var(--gold);background:rgba(201,168,76,0.1)}
+.upload-zone.has-img{border-style:solid;border-color:var(--gold)}
+.upload-zone img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;border-radius:14px}
+.upload-overlay{position:absolute;inset:0;background:rgba(0,0,0,0.6);display:flex;flex-direction:column;align-items:center;justify-content:center;gap:8px;opacity:0;transition:opacity 0.2s;border-radius:14px}
+.upload-zone.has-img:hover .upload-overlay{opacity:1}
+.upload-icon{font-size:28px;color:var(--gold)}
+.upload-text{font-size:13px;color:var(--gold);font-weight:500}
+#fileInput{display:none}
+
+.tabs{display:flex;background:rgba(0,0,0,0.4);border:1px solid var(--gold-border);border-radius:100px;padding:3px}
+.tab{flex:1;padding:9px;border-radius:100px;border:none;background:transparent;color:var(--white-dim);font-size:13px;font-weight:500;cursor:pointer;transition:all 0.2s;font-family:'Inter',sans-serif}
+.tab.active{background:var(--gold);color:#000;font-weight:700}
+
+.style-section{display:flex;flex-direction:column;gap:10px}
+.style-label{font-size:11px;color:var(--gold);letter-spacing:2px;text-transform:uppercase;font-weight:600}
+.style-chips{display:flex;flex-wrap:wrap;gap:8px}
+.chip{padding:8px 16px;border-radius:100px;border:1px solid var(--gold-border);background:transparent;color:var(--white-dim);font-size:13px;cursor:pointer;transition:all 0.2s;font-family:'Inter',sans-serif}
+.chip:hover{border-color:var(--gold);color:var(--gold)}
+.chip.selected{background:var(--gold);border-color:var(--gold);color:#000;font-weight:700}
+
+.describe-area{display:none;flex-direction:column;gap:10px}
+.describe-area.show{display:flex}
+textarea{background:rgba(0,0,0,0.4);border:1px solid var(--gold-border);border-radius:12px;color:var(--white);padding:14px;font-size:14px;font-family:'Inter',sans-serif;resize:none;height:100px;outline:none;transition:border-color 0.2s;line-height:1.6}
+textarea:focus{border-color:var(--gold)}
+textarea::placeholder{color:rgba(255,255,255,0.2)}
+
+.generate-btn{width:100%;padding:15px;border-radius:12px;background:var(--gold);color:#000;font-size:14px;font-weight:700;border:none;cursor:pointer;font-family:'Inter',sans-serif;transition:all 0.2s;display:flex;align-items:center;justify-content:center;gap:8px}
+.generate-btn:hover:not(:disabled){background:var(--gold-bright);transform:translateY(-1px)}
+.generate-btn:disabled{opacity:0.4;cursor:not-allowed;transform:none}
+.generate-btn.loading{background:rgba(201,168,76,0.5);color:rgba(0,0,0,0.6)}
+
+/* ── RIGHT PANEL ── */
+.right{display:flex;flex-direction:column;align-items:center;justify-content:center;padding:32px;background:#0a0a0a;position:relative;overflow-y:auto}
+
+/* ── CHOOSE SCREEN ── */
+.choose-screen{display:flex;flex-direction:column;align-items:center;gap:28px;width:100%;max-width:640px;animation:fadeUp 0.35s ease}
+@keyframes fadeUp{from{opacity:0;transform:translateY(12px)}to{opacity:1;transform:none}}
+.choose-eyebrow{font-size:11px;letter-spacing:2.5px;text-transform:uppercase;color:var(--gold);font-weight:600}
+.choose-heading{font-size:26px;font-weight:700;color:#fff;text-align:center;letter-spacing:-0.5px;line-height:1.3}
+.choose-cards{display:grid;grid-template-columns:1fr 1fr;gap:16px;width:100%}
+.choose-card{background:var(--black-card);border:1.5px solid var(--gold-border);border-radius:20px;padding:28px 22px;display:flex;flex-direction:column;gap:14px;cursor:pointer;transition:all 0.22s;position:relative;overflow:hidden}
+.choose-card:hover{border-color:var(--gold);background:rgba(201,168,76,0.06);transform:translateY(-2px)}
+.choose-card.highlight{border-color:var(--gold)}
+.choose-card-icon{font-size:30px;line-height:1}
+.choose-card-title{font-size:16px;font-weight:700;color:#fff;letter-spacing:-0.3px}
+.choose-card-desc{font-size:13px;color:var(--white-dim);line-height:1.6}
+.choose-card-badge{display:inline-block;padding:4px 11px;border-radius:100px;font-size:10px;font-weight:700;letter-spacing:1.5px;text-transform:uppercase;margin-top:4px}
+.badge-ai{background:var(--gold-dim);color:var(--gold);border:1px solid var(--gold-border)}
+.badge-fast{background:rgba(255,255,255,0.06);color:var(--white-dim);border:1px solid rgba(255,255,255,0.1)}
+.choose-card-arrow{position:absolute;bottom:20px;right:20px;width:28px;height:28px;border-radius:50%;background:var(--gold-dim);border:1px solid var(--gold-border);display:flex;align-items:center;justify-content:center;font-size:13px;color:var(--gold);transition:all 0.2s}
+.choose-card:hover .choose-card-arrow{background:var(--gold);color:#000}
+.choose-divider{width:100%;display:flex;align-items:center;gap:12px;color:rgba(255,255,255,0.12);font-size:12px}
+.choose-divider::before,.choose-divider::after{content:'';flex:1;height:1px;background:rgba(255,255,255,0.08)}
+
+/* ── PREVIEW EMPTY ── */
+.preview-empty{display:flex;flex-direction:column;align-items:center;gap:12px;text-align:center}
+.preview-empty-icon{font-size:48px;opacity:0.2}
+.preview-empty-title{font-size:16px;font-weight:500;color:var(--white-dim)}
+.preview-empty-sub{font-size:13px;color:rgba(255,255,255,0.2);max-width:280px;line-height:1.6}
+
+.preview-result{display:none;flex-direction:column;gap:20px;width:100%;max-width:600px}
+.preview-result.show{display:flex}
+
+.result-images{display:grid;grid-template-columns:1fr 1fr;gap:16px}
+.result-img-wrap{border-radius:18px;overflow:hidden;aspect-ratio:4/5;position:relative;background:#1a1a1a;border:1px solid var(--gold-border)}
+.result-img-wrap img{width:100%;height:100%;object-fit:cover}
+.result-label{position:absolute;bottom:12px;left:12px;background:rgba(0,0,0,0.75);backdrop-filter:blur(8px);padding:5px 12px;border-radius:100px;font-size:11px;color:var(--gold);font-weight:600;border:1px solid var(--gold-border)}
+
+.result-info{background:var(--black-card);border:1px solid var(--gold-border);border-radius:18px;padding:24px;display:grid;grid-template-columns:1fr 1fr 1fr;gap:20px}
+.info-item-label{font-size:10px;letter-spacing:2px;text-transform:uppercase;color:var(--gold);margin-bottom:6px;font-weight:600}
+.info-item-value{font-size:16px;font-weight:700;color:#fff}
+.info-item-sub{font-size:12px;color:var(--white-dim);margin-top:2px}
+
+.result-description{background:var(--black-card);border:1px solid var(--gold-border);border-radius:18px;padding:24px}
+.result-description h3{font-size:11px;font-weight:700;margin-bottom:10px;color:var(--gold);letter-spacing:2px;text-transform:uppercase}
+.result-description p{font-size:14px;color:rgba(255,255,255,0.6);line-height:1.75}
+
+.loader{display:none;flex-direction:column;align-items:center;gap:16px;text-align:center}
+.loader.show{display:flex}
+.spinner{width:44px;height:44px;border:3px solid var(--gold-dim);border-top-color:var(--gold);border-radius:50%;animation:spin 0.9s linear infinite}
+.loader-text{font-size:14px;color:var(--gold)}
+@keyframes spin{to{transform:rotate(360deg)}}
+
+.book-btn{width:100%;padding:15px;border-radius:12px;background:#fff;color:#000;font-size:14px;font-weight:700;border:none;cursor:pointer;font-family:'Inter',sans-serif;transition:all 0.2s;display:flex;align-items:center;justify-content:center;gap:8px;letter-spacing:0.3px}
+.book-btn:hover{background:var(--gold-bright);transform:translateY(-1px)}
+
+.sample-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;width:100%;max-width:500px;margin-top:32px;opacity:0.35}
+.sample-item{aspect-ratio:1;border-radius:12px;background:#1a1a1a;overflow:hidden;position:relative;display:flex;align-items:flex-end;padding:6px;border:1px solid var(--gold-border)}
+.sample-item-label{font-size:9px;color:var(--gold);text-align:center;letter-spacing:1px;text-transform:uppercase;width:100%}
+
+.error-msg{background:rgba(220,50,50,0.1);border:1px solid rgba(220,50,50,0.3);border-radius:12px;padding:14px;font-size:13px;color:#ff8080;line-height:1.5;display:none}
+.error-msg.show{display:block}
+
+/* ── BOOKING MODAL ── */
+.modal-backdrop{position:fixed;inset:0;background:rgba(0,0,0,0.85);z-index:1000;display:none;align-items:center;justify-content:center;padding:20px;backdrop-filter:blur(4px)}
+.modal-backdrop.open{display:flex}
+.modal{background:#111;border:1px solid var(--gold-border);border-radius:24px;width:100%;max-width:480px;max-height:90vh;overflow-y:auto;padding:32px;position:relative;animation:modalIn 0.25s ease}
+@keyframes modalIn{from{opacity:0;transform:scale(0.96) translateY(8px)}to{opacity:1;transform:none}}
+.modal-close{position:absolute;top:20px;right:20px;width:32px;height:32px;border-radius:50%;border:1px solid var(--gold-border);background:transparent;color:var(--gold);font-size:18px;cursor:pointer;display:flex;align-items:center;justify-content:center;transition:all 0.2s;line-height:1}
+.modal-close:hover{background:var(--gold-dim)}
+.modal-header{margin-bottom:24px}
+.modal-tag{font-size:10px;letter-spacing:2px;text-transform:uppercase;color:var(--gold);font-weight:600;margin-bottom:8px}
+.modal-title{font-size:22px;font-weight:700;color:#fff;letter-spacing:-0.5px}
+.modal-subtitle{font-size:13px;color:var(--white-dim);margin-top:4px;line-height:1.5}
+
+/* FIX: Booking summary — added dye price row */
+.booking-summary{background:var(--black-card);border:1px solid var(--gold-border);border-radius:14px;padding:16px 20px;margin-bottom:24px}
+.bs-top{display:flex;align-items:center;justify-content:space-between;margin-bottom:10px}
+.bs-left{display:flex;flex-direction:column;gap:3px}
+.bs-style{font-size:15px;font-weight:700;color:#fff}
+.bs-meta{font-size:12px;color:var(--white-dim)}
+.bs-price{font-size:20px;font-weight:700;color:var(--gold)}
+.bs-dye-row{display:flex;align-items:center;justify-content:space-between;padding-top:10px;border-top:1px solid rgba(255,255,255,0.06)}
+.bs-dye-label{font-size:11px;letter-spacing:1.5px;text-transform:uppercase;color:var(--white-dim);font-weight:600}
+.bs-dye-price{font-size:14px;font-weight:600;color:var(--gold)}
+
+/* Style picker inside booking modal */
+.modal-style-picker{display:none;flex-direction:column;gap:12px;margin-bottom:20px}
+.modal-style-picker.show{display:flex}
+.modal-style-chips{display:flex;flex-wrap:wrap;gap:8px}
+.modal-chip{padding:7px 14px;border-radius:100px;border:1px solid var(--gold-border);background:transparent;color:var(--white-dim);font-size:12px;cursor:pointer;transition:all 0.2s;font-family:'Inter',sans-serif}
+.modal-chip:hover{border-color:var(--gold);color:var(--gold)}
+.modal-chip.selected{background:var(--gold);border-color:var(--gold);color:#000;font-weight:700}
+
+.form-grid{display:flex;flex-direction:column;gap:16px}
+.form-row{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.form-group{display:flex;flex-direction:column;gap:6px}
+.form-label{font-size:11px;letter-spacing:1.5px;text-transform:uppercase;color:var(--gold);font-weight:600}
+.form-input{background:rgba(0,0,0,0.5);border:1px solid var(--gold-border);border-radius:10px;color:var(--white);padding:12px 14px;font-size:14px;font-family:'Inter',sans-serif;outline:none;transition:border-color 0.2s;width:100%}
+.form-input:focus{border-color:var(--gold)}
+.form-input::placeholder{color:rgba(255,255,255,0.2)}
+.form-input option{background:#111;color:#fff}
+.form-note{font-size:12px;color:rgba(255,255,255,0.2);line-height:1.5}
+
+.modal-footer{margin-top:24px;display:flex;flex-direction:column;gap:10px}
+.confirm-btn{width:100%;padding:15px;border-radius:12px;background:var(--gold);color:#000;font-size:14px;font-weight:700;border:none;cursor:pointer;font-family:'Inter',sans-serif;transition:all 0.2s}
+.confirm-btn:hover:not(:disabled){background:var(--gold-bright);transform:translateY(-1px)}
+.confirm-btn:disabled{opacity:0.5;cursor:not-allowed}
+.cancel-link{text-align:center;font-size:13px;color:var(--white-dim);cursor:pointer;padding:4px}
+.cancel-link:hover{color:var(--white)}
+
+.booking-success{display:none;flex-direction:column;align-items:center;gap:16px;text-align:center;padding:20px 0}
+.booking-success.show{display:flex}
+.success-icon{width:64px;height:64px;border-radius:50%;background:var(--gold-dim);border:1px solid var(--gold-border);display:flex;align-items:center;justify-content:center;font-size:28px}
+.success-title{font-size:20px;font-weight:700;color:#fff}
+.success-sub{font-size:14px;color:var(--white-dim);line-height:1.6;max-width:340px}
+.success-ref{font-size:12px;color:var(--gold);font-weight:600;letter-spacing:1px;margin-top:4px}
+.success-details{background:var(--black-card);border:1px solid var(--gold-border);border-radius:14px;padding:16px 20px;width:100%;text-align:left}
+.sd-row{display:flex;justify-content:space-between;padding:6px 0;font-size:13px;border-bottom:1px solid rgba(255,255,255,0.05)}
+.sd-row:last-child{border-bottom:none}
+.sd-label{color:var(--white-dim)}
+.sd-val{color:#fff;font-weight:500}
+.done-btn{width:100%;padding:13px;border-radius:12px;background:transparent;border:1px solid var(--gold-border);color:var(--gold);font-size:14px;font-weight:600;cursor:pointer;font-family:'Inter',sans-serif;transition:all 0.2s}
+.done-btn:hover{background:var(--gold-dim)}
+
+@media(max-width:800px){
+  .main{grid-template-columns:1fr;height:auto}
+  .right{min-height:50vh}
+  .result-images{grid-template-columns:1fr}
+  .result-info{grid-template-columns:1fr 1fr}
+  .form-row{grid-template-columns:1fr}
+  .modal{padding:24px 20px}
+  .choose-cards{grid-template-columns:1fr}
+}
+</style>
+</head>
+<body>
+
+<header>
+  <button class="back-btn" onclick="history.back()">←</button>
+  <h1>Haircut Preview — Mzansi Fade Barbershop</h1>
+   <img src="images/Ff.png" width="80" height="50" alt="logo"/>
+</header>
+<p class="subtitle">Upload your photo, pick a style or describe what you want, and see your look — with real Mzansi Fade Barbershop pricing.</p>
+
+<div class="main">
+  <!-- ── LEFT ── -->
+  <div class="left">
+    <div class="upload-zone" id="uploadZone" onclick="document.getElementById('fileInput').click()">
+      <div class="upload-icon">↑</div>
+      <div class="upload-text">Tap to upload your photo</div>
+      <div class="upload-overlay">
+        <div style="font-size:20px">📷</div>
+        <div style="font-size:12px;color:rgba(255,255,255,0.7)">Change photo</div>
+      </div>
+    </div>
+    <input type="file" id="fileInput" accept="image/*">
+
+    <div class="tabs">
+      <button class="tab active" id="tabPick" onclick="switchTab('pick')">Pick a style</button>
+      <button class="tab" id="tabDescribe" onclick="switchTab('describe')">Describe it</button>
+    </div>
+
+    <div class="style-section" id="pickPanel">
+      <div class="style-label">Choose a style</div>
+      <div class="style-chips">
+        <button class="chip" onclick="selectChip(this)">Brush Cut</button>
+        <button class="chip" onclick="selectChip(this)">Cut — Low Fade</button>
+        <button class="chip" onclick="selectChip(this)">Cut — Mid Fade</button>
+        <button class="chip" onclick="selectChip(this)">Cut — High Fade</button>
+        <button class="chip" onclick="selectChip(this)">Taper — Low Fade</button>
+        <button class="chip" onclick="selectChip(this)">Taper — Mid Fade</button>
+        <button class="chip" onclick="selectChip(this)">Taper — High Fade</button>
+        <button class="chip" onclick="selectChip(this)">Brush & Lower Hair</button>
+        <button class="chip" onclick="selectChip(this)">Mohawk</button>
+        <button class="chip" onclick="selectChip(this)">Trimming</button>
+      </div>
+    </div>
+
+    <div class="describe-area" id="describePanel">
+      <div class="style-label">Describe your style</div>
+      <textarea id="styleDesc" placeholder="e.g. A clean low fade with a sharp line up, medium length on top with a slight wave..."></textarea>
+    </div>
+
+    <div class="error-msg" id="errorMsg"></div>
+
+    <button class="generate-btn" id="generateBtn" onclick="generatePreview()">
+      ✦ Generate Preview
+    </button>
+  </div>
+
+  <!-- ── RIGHT ── -->
+  <div class="right" id="rightPanel">
+
+    <!-- CHOOSE SCREEN (default) -->
+    <div class="choose-screen" id="chooseScreen">
+      <div class="choose-eyebrow">What would you like to do?</div>
+      <div class="choose-heading">Preview your haircut first,<br>or book straight away</div>
+
+      <div class="choose-cards">
+        <div class="choose-card highlight" onclick="startPreview()">
+          <div class="choose-card-icon">✂️</div>
+          <div class="choose-card-title">Preview my haircut</div>
+          <div class="choose-card-desc">Upload a photo, pick a style, and see haircut preview before you commit.</div>
+          <div class="choose-card-badge badge-ai">✦ Haircut Preview</div>
+          <div class="choose-card-arrow">→</div>
+        </div>
+
+        <div class="choose-card" onclick="openDirectBooking()">
+          <div class="choose-card-icon">📅</div>
+          <div class="choose-card-title">Book without preview</div>
+          <div class="choose-card-desc">Know exactly what you want? Skip the preview and book your appointment now.</div>
+          <div class="choose-card-badge badge-fast">Quick Book</div>
+          <div class="choose-card-arrow">→</div>
+        </div>
+      </div>
+
+      <div class="choose-divider">No payment needed — pay at the shop</div>
+    </div>
+
+    <!-- EMPTY STATE -->
+    <div class="preview-empty" id="emptyState" style="display:none">
+      <div class="preview-empty-icon">✂️</div>
+      <div class="preview-empty-title">Your preview will appear here</div>
+      <div class="preview-empty-sub">Upload a photo and choose a style to get started.</div>
+      <div class="sample-grid">
+        <div class="sample-item" style="background:linear-gradient(135deg,#1e1e1e,#2a2a2a)"><div class="sample-item-label">Fade</div></div>
+        <div class="sample-item" style="background:linear-gradient(135deg,#1a1f1a,#252d25)"><div class="sample-item-label">Afro</div></div>
+        <div class="sample-item" style="background:linear-gradient(135deg,#1f1a1a,#2d2525)"><div class="sample-item-label">Braids</div></div>
+        <div class="sample-item" style="background:linear-gradient(135deg,#1a1a1f,#25252d)"><div class="sample-item-label">Taper</div></div>
+        <div class="sample-item" style="background:linear-gradient(135deg,#1f1f1a,#2d2d25)"><div class="sample-item-label">Buzz Cut</div></div>
+        <div class="sample-item" style="background:linear-gradient(135deg,#1a1f1f,#252d2d)"><div class="sample-item-label">Cornrows</div></div>
+      </div>
+    </div>
+
+    <div class="loader" id="loader">
+      <div class="spinner"></div>
+      <div class="loader-text" id="loaderText">Analysing your look...</div>
+    </div>
+
+    <div class="preview-result" id="previewResult">
+      <div class="result-images">
+        <div class="result-img-wrap" id="originalImgWrap">
+          <img id="originalImg" src="" alt="Your photo">
+          <div class="result-label">Your photo</div>
+        </div>
+        <div class="result-img-wrap" id="previewImgWrap" style="background:linear-gradient(135deg,#1a1200,#2e2200);display:flex;align-items:center;justify-content:center;border:1px solid rgba(201,168,76,0.3)">
+          <div style="text-align:center;padding:20px">
+            <div style="font-size:36px;margin-bottom:12px">✂️</div>
+             <img src="images/Ff.png" width="60" alt="logo"/>
+            <div id="previewStyleName" style="font-size:16px;font-weight:700;color:#c9a84c;margin-bottom:6px"></div>
+            <div style="font-size:12px;color:rgba(255,255,255,0.4)">Style Preview</div>
+          </div>
+          <div class="result-label" id="previewLabel">Preview</div>
+        </div>
+      </div>
+
+      <div class="result-info" id="resultInfo">
+        <div class="info-item">
+          <div class="info-item-label">Style</div>
+          <div class="info-item-value" id="infoStyle">—</div>
+        </div>
+        <div class="info-item">
+          <div class="info-item-label">Duration</div>
+          <div class="info-item-value" id="infoDuration">—</div>
+          <div class="info-item-sub" id="infoDurationSub"></div>
+        </div>
+        <div class="info-item">
+          <div class="info-item-label">Price</div>
+          <div class="info-item-value" id="infoPrice">—</div>
+          <div class="info-item-sub" id="infoDyePrice">Dye: —</div>
+        </div>
+      </div>
+
+      <div class="result-description">
+        <h3>Barber's Notes</h3>
+        <p id="resultDesc">—</p>
+      </div>
+
+      <button class="book-btn" onclick="openBookingModal(false)">
+        Book This Style at Mzansi Fade Barbershop →
+      </button>
+    </div>
+  </div>
+</div>
+
+<!-- ── BOOKING MODAL ── -->
+<div class="modal-backdrop" id="bookingModal" onclick="handleBackdropClick(event)">
+  <div class="modal" id="modalInner">
+    <button class="modal-close" onclick="closeBookingModal()">✕</button>
+
+    <div id="bookingForm">
+      <div class="modal-header">
+        <div class="modal-tag">Mzansi Fade Barbershop
+         <img src="images/Ff.png" width="60" alt="logo"/></div>
+        <div class="modal-title" id="modalTitle">Book your appointment</div>
+        <div class="modal-subtitle" id="modalSubtitle">Fill in your details and we'll confirm your slot.</div>
+      </div>
+
+      <!-- FIX: Split booking summary into top row + dye price row -->
+      <div class="booking-summary" id="bookingSummary">
+        <div class="bs-top">
+          <div class="bs-left">
+            <div class="bs-style" id="bsStyle">—</div>
+            <div class="bs-meta" id="bsMeta">—</div>
+          </div>
+          <div class="bs-price" id="bsPrice">—</div>
+        </div>
+        <div class="bs-dye-row">
+          <div class="bs-dye-label">+ Dye (optional)</div>
+          <div class="bs-dye-price" id="bsDyePrice">—</div>
+        </div>
+      </div>
+
+      <!-- Style picker shown only for direct booking -->
+      <div class="modal-style-picker" id="modalStylePicker">
+        <div class="form-label">Choose your style</div>
+        <div class="modal-style-chips">
+          <!-- FIX: Correct parameter order — selectModalChip(el, styleName, duration, price, dyePrice) -->
+          <button class="modal-chip" onclick="selectModalChip(this,'Brush Cut','~40 min','R50','R80')">Brush Cut</button>
+          <button class="modal-chip" onclick="selectModalChip(this,'Cut — Low Fade','~40 min','R50','R80')">Cut — Low Fade</button>
+          <button class="modal-chip" onclick="selectModalChip(this,'Cut — Mid Fade','~40 min','R50','R80')">Cut — Mid Fade</button>
+          <button class="modal-chip" onclick="selectModalChip(this,'Cut — High Fade','~40 min','R50','R80')">Cut — High Fade</button>
+          <button class="modal-chip" onclick="selectModalChip(this,'Taper — Low Fade','~40 min','R50','R80')">Taper — Low Fade</button>
+          <button class="modal-chip" onclick="selectModalChip(this,'Taper — Mid Fade','~40 min','R50','R80')">Taper — Mid Fade</button>
+          <button class="modal-chip" onclick="selectModalChip(this,'Taper — High Fade','~40 min','R50','R80')">Taper — High Fade</button>
+          <button class="modal-chip" onclick="selectModalChip(this,'Brush & Lower Hair','~40 min','R30','R60')">Brush & Lower Hair</button>
+          <button class="modal-chip" onclick="selectModalChip(this,'Mohawk','~40 min','R50','R80')">Mohawk</button>
+          <button class="modal-chip" onclick="selectModalChip(this,'Trimming','~20 min','R15','R30')">Trimming</button>
+        </div>
+      </div>
+
+      <div class="form-grid">
+        <div class="form-row">
+          <div class="form-group">
+            <div class="form-label">First name</div>
+            <input class="form-input" id="fName" type="text" placeholder="e.g. Thabo">
+          </div>
+          <div class="form-group">
+            <div class="form-label">Last name</div>
+            <input class="form-input" id="lName" type="text" placeholder="e.g. Nkosi">
+          </div>
+        </div>
+
+        <div class="form-group">
+          <div class="form-label">Phone number</div>
+          <input class="form-input" id="phone" type="tel" placeholder="+27 00 000 0000">
+        </div>
+
+        <div class="form-row">
+          <div class="form-group">
+            <div class="form-label">Date</div>
+            <input class="form-input" id="bookDate" type="date">
+          </div>
+          <div class="form-group">
+            <div class="form-label">Preferred time</div>
+            <select class="form-input" id="bookTime">
+              <option value="">Select a time</option>
+              <option>08:00</option><option>08:30</option><option>09:00</option>
+              <option>09:30</option><option>10:00</option><option>10:30</option>
+              <option>11:00</option><option>11:30</option><option>12:00</option>
+              <option>12:30</option><option>13:00</option><option>13:30</option>
+              <option>14:00</option><option>14:30</option><option>15:00</option>
+              <option>15:30</option><option>16:00</option><option>16:30</option>
+              <option>17:00</option>
+            </select>
+          </div>
+        </div>
+
+        <div class="form-group">
+          <div class="form-label">Notes for your barber <span style="color:rgba(255,255,255,0.2);font-size:10px;text-transform:none;letter-spacing:0">(optional)</span></div>
+          <textarea id="bookNotes" placeholder="Any extra requests or things your barber should know..." style="height:72px"></textarea>
+        </div>
+
+        <div class="form-note">We'll confirm your booking via WhatsApp or phone call. No payment needed now — pay at the shop.</div>
+      </div>
+
+      <div class="modal-footer">
+        <button class="confirm-btn" id="confirmBtn" onclick="submitBooking()">Confirm Booking</button>
+        <div class="cancel-link" onclick="closeBookingModal()">Cancel</div>
+      </div>
+    </div>
+
+    <!-- SUCCESS -->
+    <div class="booking-success" id="bookingSuccess">
+      <div class="success-icon">✓</div>
+      <div class="success-title">You're booked in!</div>
+       <img src="images/Ff.png" width="80" height="60" alt="logo"/>
+      <div class="success-sub">Your booking has been received. Mzansi Fade Barbershop will confirm via WhatsApp or phone shortly.</div>
+      <div class="success-ref" id="successRef"></div>
+      <div class="success-details" id="successDetails"></div>
+      <button class="done-btn" onclick="closeBookingModal()">Done</button>
+    </div>
+  </div>
+</div>
+
+<script>
+  // ── keys ──────────────────────────────────────
+  const EMAILJS_PUBLIC_KEY = 'jjFjaY4frp1mr7aFB';
+  const EMAILJS_SERVICE    = 'service_6k89gkh';
+  const EMAILJS_TEMPLATE   = 'template_an79k1d';
+  // ─────────────────────────────────────────────
+
+  emailjs.init(EMAILJS_PUBLIC_KEY);
+
+  let uploadedImageBase64 = null;
+  let selectedChip = null;
+  let currentTab = 'pick';
+  let currentResult = {};
+  let isDirectBooking = false;
+
+  const dateInput = document.getElementById('bookDate');
+  dateInput.min = new Date().toISOString().split('T')[0];
+
+  // ── File upload ──────────────────────────────────────────────────────────
+  document.getElementById('fileInput').addEventListener('change', (e) => {
+    const file = e.target.files[0];
+    if (!file) return;
+    const reader = new FileReader();
+    reader.onload = (ev) => {
+      uploadedImageBase64 = ev.target.result;
+      const uploadZone = document.getElementById('uploadZone');
+      uploadZone.classList.add('has-img');
+      let img = uploadZone.querySelector('img');
+      if (!img) { img = document.createElement('img'); uploadZone.insertBefore(img, uploadZone.firstChild); }
+      img.src = uploadedImageBase64;
+      document.getElementById('originalImg').src = uploadedImageBase64;
+    };
+    reader.readAsDataURL(file);
+  });
+
+  // ── Tab switching ────────────────────────────────────────────────────────
+  function switchTab(tab) {
+    currentTab = tab;
+    document.getElementById('tabPick').classList.toggle('active', tab === 'pick');
+    document.getElementById('tabDescribe').classList.toggle('active', tab === 'describe');
+    document.getElementById('pickPanel').style.display = tab === 'pick' ? 'flex' : 'none';
+    document.getElementById('pickPanel').style.flexDirection = 'column';
+    document.getElementById('describePanel').classList.toggle('show', tab === 'describe');
+  }
+
+  function selectChip(el) {
+    document.querySelectorAll('.chip').forEach(c => c.classList.remove('selected'));
+    el.classList.add('selected');
+    selectedChip = el.textContent.trim();
+  }
+
+  // ── Right-panel state ────────────────────────────────────────────────────
+  function showState(state) {
+    document.getElementById('chooseScreen').style.display  = state === 'choose'  ? 'flex'  : 'none';
+    document.getElementById('emptyState').style.display    = state === 'empty'   ? 'flex'  : 'none';
+    document.getElementById('loader').classList.toggle('show', state === 'loading');
+    document.getElementById('previewResult').classList.toggle('show', state === 'result');
+  }
+
+  function setLoaderText(t) { document.getElementById('loaderText').textContent = t; }
+
+  function showError(msg) {
+    const el = document.getElementById('errorMsg');
+    el.textContent = msg; el.classList.add('show');
+    setTimeout(() => el.classList.remove('show'), 6000);
+  }
+
+  // ── Choose screen actions ────────────────────────────────────────────────
+  function startPreview() { showState('empty'); }
+  function openDirectBooking() { openBookingModal(true); }
+
+  // ── Generate preview ─────────────────────────────────────────────────────
+  function generatePreview() {
+    const styleDesc = document.getElementById('styleDesc').value.trim();
+    const styleName = currentTab === 'pick' ? selectedChip : styleDesc;
+
+    if (!styleName) {
+      showError(currentTab === 'pick' ? 'Please select a style first.' : 'Please describe the style you want.');
+      return;
+    }
+
+    const styles = {
+      "Brush Cut":           { duration:"~40 min", durationNote:"Simple and clean",    price:"R50", dyePrice:"R80",  barbersNotes:"A neat and low-maintenance haircut perfect for everyday wear." },
+      "Cut — Low Fade":      { duration:"~40 min", durationNote:"Professional look",   price:"R50", dyePrice:"R80",  barbersNotes:"A clean fade starting low on the sides for a modern finish." },
+      "Cut — Mid Fade":      { duration:"~40 min", durationNote:"Most popular",        price:"R50", dyePrice:"R80",  barbersNotes:"Balanced fade that works well with most face shapes." },
+      "Cut — High Fade":     { duration:"~40 min", durationNote:"Sharp finish",        price:"R50", dyePrice:"R80",  barbersNotes:"A bold high fade with a crisp modern appearance." },
+      "Taper — Low Fade":    { duration:"~40 min", durationNote:"Natural blend",       price:"R50", dyePrice:"R80",  barbersNotes:"Smooth taper that keeps the haircut looking natural." },
+      "Taper — Mid Fade":    { duration:"~40 min", durationNote:"Modern taper",        price:"R50", dyePrice:"R80",  barbersNotes:"Stylish taper fade suitable for casual and formal settings." },
+      "Taper — High Fade":   { duration:"~40 min", durationNote:"Clean edges",         price:"R50", dyePrice:"R80",  barbersNotes:"A high taper fade with a sharp and fresh finish." },
+      "Brush & Lower Hair":  { duration:"~40 min", durationNote:"Budget option",       price:"R30", dyePrice:"R60",  barbersNotes:"Clean brush style with lower hair trimming." },
+      "Mohawk":              { duration:"~40 min", durationNote:"Bold style",           price:"R50", dyePrice:"R80",  barbersNotes:"A standout haircut with shaved sides and a raised strip through the centre." },
+      "Trimming":            { duration:"~20 min", durationNote:"Quick service",        price:"R15", dyePrice:"R30",  barbersNotes:"Perfect for maintaining your current haircut and beard line." }
+    };
+
+    const result = styles[styleName] || {
+      duration:"~40 min", durationNote:"Custom style", price:"Ask Barber", dyePrice:"Ask Barber",
+      barbersNotes:"Custom haircut based on your description."
+    };
+
+    currentResult = {
+      styleName,
+      duration: result.duration,
+      durationNote: result.durationNote,
+      price: result.price,
+      dyePrice: result.dyePrice,
+      barbersNotes: result.barbersNotes
+    };
+
+    document.getElementById('previewStyleName').textContent = styleName;
+    document.getElementById('previewLabel').textContent = styleName;
+    document.getElementById('infoStyle').textContent = styleName;
+    document.getElementById('infoDuration').textContent = result.duration;
+    document.getElementById('infoDurationSub').textContent = result.durationNote || '';
+    document.getElementById('infoPrice').textContent = result.price;
+    // FIX: Use dedicated element for dye price instead of overwriting via querySelector
+    document.getElementById('infoDyePrice').textContent = 'Dye: ' + result.dyePrice;
+    document.getElementById('resultDesc').textContent = result.barbersNotes;
+
+    showState('result');
+  }
+
+  // ── Booking modal ────────────────────────────────────────────────────────
+  function openBookingModal(directBook) {
+    isDirectBooking = directBook;
+    const picker  = document.getElementById('modalStylePicker');
+    const summary = document.getElementById('bookingSummary');
+    const title   = document.getElementById('modalTitle');
+    const subtitle = document.getElementById('modalSubtitle');
+
+    if (directBook) {
+      title.textContent    = 'Book your appointment';
+      subtitle.textContent = 'Choose a style and fill in your details.';
+      picker.classList.add('show');
+      summary.style.display = 'none';
+      document.querySelectorAll('.modal-chip').forEach(c => c.classList.remove('selected'));
+      currentResult = {};
+    } else {
+      title.textContent    = 'Book this style';
+      subtitle.textContent = 'Your details are pre-filled from your preview.';
+      picker.classList.remove('show');
+      summary.style.display = 'block';
+      // FIX: Populate all three fields including dye price
+      document.getElementById('bsStyle').textContent   = currentResult.styleName || '—';
+      document.getElementById('bsMeta').textContent    = currentResult.duration  || '—';
+      document.getElementById('bsPrice').textContent   = currentResult.price     || '—';
+      document.getElementById('bsDyePrice').textContent = currentResult.dyePrice || '—';
+    }
+
+    document.getElementById('bookingForm').style.display = 'block';
+    document.getElementById('bookingSuccess').classList.remove('show');
+    document.getElementById('bookingModal').classList.add('open');
+    document.body.style.overflow = 'hidden';
+  }
+
+  // FIX: Corrected parameter order — (el, styleName, duration, price, dyePrice)
+  function selectModalChip(el, styleName, duration, price, dyePrice) {
+    document.querySelectorAll('.modal-chip').forEach(c => c.classList.remove('selected'));
+    el.classList.add('selected');
+    currentResult.styleName = styleName;
+    currentResult.duration  = duration;
+    currentResult.price     = price;
+    currentResult.dyePrice  = dyePrice;
+    // Show summary with all fields
+    const summary = document.getElementById('bookingSummary');
+    summary.style.display = 'block';
+    document.getElementById('bsStyle').textContent    = styleName;
+    document.getElementById('bsMeta').textContent     = duration;
+    document.getElementById('bsPrice').textContent    = price;
+    document.getElementById('bsDyePrice').textContent = dyePrice;
+  }
+
+  function closeBookingModal() {
+    document.getElementById('bookingModal').classList.remove('open');
+    document.body.style.overflow = '';
+  }
+
+  function handleBackdropClick(e) {
+    if (e.target === document.getElementById('bookingModal')) closeBookingModal();
+  }
+
+  // ── Submit booking ────────────────────────────────────────────────────────
+  async function submitBooking() {
+    if (isDirectBooking && !currentResult.styleName) {
+      showError('Please select a hairstyle before booking.');
+      return;
+    }
+
+    const fName = document.getElementById('fName').value.trim();
+    const lName = document.getElementById('lName').value.trim();
+    const phone = document.getElementById('phone').value.trim();
+    const date  = document.getElementById('bookDate').value;
+    const time  = document.getElementById('bookTime').value;
+    const notes = document.getElementById('bookNotes').value.trim();
+
+    if (!fName || !lName) { alert('Please enter your name.'); return; }
+    if (!phone)           { alert('Please enter your phone number.'); return; }
+    if (!date)            { alert('Please choose a date.'); return; }
+    if (!time)            { alert('Please choose a time.'); return; }
+
+    const btn = document.getElementById('confirmBtn');
+    btn.disabled = true; btn.textContent = 'Sending booking...';
+
+    const dateFormatted = new Date(date).toLocaleDateString('en-ZA',{weekday:'long',year:'numeric',month:'long',day:'numeric'});
+    const ref = 'MF-' + Math.random().toString(36).substring(2,8).toUpperCase();
+
+    try {
+      await emailjs.send(EMAILJS_SERVICE, EMAILJS_TEMPLATE, {
+        client_name:  fName + ' ' + lName,
+        client_phone: phone,
+        style:        currentResult.styleName || '—',
+        date:         dateFormatted,
+        time:         time,
+        price:        currentResult.price     || '—',
+        dye_price:    currentResult.dyePrice  || '—',
+        notes:        notes || 'None',
+        ref:          ref
+      });
+
+      document.getElementById('successRef').textContent = 'Ref: ' + ref;
+      const details = [
+        ['Name',      fName + ' ' + lName],
+        ['Phone',     phone],
+        ['Style',     currentResult.styleName || '—'],
+        ['Date',      dateFormatted],
+        ['Time',      time],
+        ['Price',     currentResult.price     || '—'],
+        ['Dye Price', currentResult.dyePrice  || '—'],
+      ];
+      document.getElementById('successDetails').innerHTML = details.map(([l,v]) =>
+        `<div class="sd-row"><span class="sd-label">${l}</span><span class="sd-val">${v}</span></div>`
+      ).join('');
+
+      document.getElementById('bookingForm').style.display = 'none';
+      document.getElementById('bookingSuccess').classList.add('show');
+    } catch(err) {
+      console.error(err);
+      alert('Booking failed: ' + (err?.text || err.message || 'Unknown error'));
+    } finally {
+      btn.disabled = false; btn.textContent = 'Confirm Booking';
+    }
+  }
+</script>
+</body>
+</html>

@@ -1,0 +1,698 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Mzansi Fade Barbershop — south africa's #1 Barbershop</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;900&display=swap" rel="stylesheet">
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+html{scroll-behavior:smooth}
+body{font-family:'Inter',sans-serif;background:#0a0a0a;color:#fff;overflow-x:hidden}
+
+/* NAV */
+nav{position:fixed;top:20px;left:15%;right:15%;z-index:100; border-radius: 30px ;padding:15px 40px;display:flex;align-items:center;justify-content:space-between;backdrop-filter:blur(6px);border-bottom:0.5px solid rgba(255,255,255,0.08);transition:padding 0.3s}
+nav.scrolled{padding:14px 60px}
+.nav-logo{ background: linear-gradient(90deg, #fffffe, #ffffff, #ffffff);
+  background-clip: text;
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+    font-size:13px;font-weight:700;letter-spacing:3px;text-transform:uppercase}
+.nav-logo img {
+  height:70px; 
+  width:auto;
+}
+.nav-links{display:flex;gap:32px}
+.nav-links a{background: linear-gradient(90deg,rgb(255, 237, 123), #F4E4A6, #ffffff);
+  background-clip: text;
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+    text-decoration:none;font-size:13px;letter-spacing:0.5px;transition:color 0.2s}
+.nav-links:hover{background: linear-gradient(90deg,rgb(255, 255, 255), #9c9c9c, #ffffff);
+  background-clip: text;
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;}
+.nav-cta{background:#fff;color:#000;padding:10px 22px;border-radius:100px;font-size:13px;font-weight:600;text-decoration:none;transition:transform 0.2s,background 0.2s;display:inline-flex;align-items:center;gap:6px}
+.nav-cta:hover{background:goldenrod;transform:scale(1.03)}
+.menu-toggle{
+    display:none;
+    background:none;
+    border:none;
+    color:white;
+    font-size:30px;
+    cursor:pointer;
+}
+
+/* Hide toggle on desktop */
+.menu-toggle {
+  display: none;
+  font-size: 24px;
+  background: none;
+  border: none;
+  color: gold;
+  cursor: pointer;
+}
+
+/* Mobile view */
+@media (max-width: 768px) {
+  .menu-toggle {
+    display: block;
+  }
+  .nav-links {
+    flex-direction: column;
+    background: #0a0a0a;
+    position: absolute;
+    top: 70px;
+    right: 15%;
+    width: 220px;
+    display: none;
+    padding: 15px;
+    border-radius: 12px;
+  }
+  .nav-links.show {
+    display: flex;
+    animation: slideDown 0.3s ease forwards;
+  }
+}
+
+/* Smooth animation */
+@keyframes slideDown {
+  from { opacity: 0; transform: translateY(-10px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+
+/* HERO */
+.hero{text-align: center; min-height:100vh;display:flex;flex-direction:column;justify-content:flex-end;padding:0 60px 80px;background:url('images/o.jpg') center center/cover no-repeat;position:relative;overflow:hidden}
+.hero-bg{position:absolute;inset:0;background:radial-gradient(ellipse at 70% 40%,rgba(60,52,137,0.18) 0%,transparent 65%);pointer-events:none}
+.hero-noise{position:absolute;inset:0;opacity:0.03;background-image:url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)'/%3E%3C/svg%3E");pointer-events:none}
+.hero-eyebrow{font-size:12px;letter-spacing:4px;text-transform:uppercase;color:rgba(255,255,255,0.35);margin-bottom:24px;opacity:0;animation:fadeIn 0.8s 0.2s forwards}
+.hero-title{font-size:clamp(72px,12vw,160px);font-weight:900;line-height:0.88;letter-spacing:-3px;}
+.hero-title span{display:block;opacity:0;transform:translateY(80px);animation:slideUp 0.9s cubic-bezier(0.16,1,0.3,1) forwards}
+.hero-title span:nth-child(1){animation-delay:0.1s}
+.hero-title span:nth-child(2){animation-delay:0.25s}
+.hero-sub{display:flex;align-items:center;justify-content:space-between;margin-top:48px;padding-top:32px;border-top:0.5px solid rgba(255,255,255,0.12);opacity:0;animation:fadeIn 0.8s 0.6s forwards;}
+.hero-tagline{font-size:15px;color:rgba(255,255,255,0.45);max-width:340px;line-height:1.7}
+.hero-btns{display:flex;gap:12px;}
+.btn-outline{border:1px solid rgba(255,255,255,0.3);color:#fff;padding:14px 28px;border-radius:100px;font-size:14px;font-weight:500;cursor:pointer;background:transparent;transition:all 0.2s;text-decoration:none;display:inline-flex;align-items:center;gap:6px}
+.btn-outline:hover{border-color:#fff;background:rgba(255,255,255,0.06)}
+.btn-primary{background:#ffffff;color:#000;padding:14px 28px;border-radius:100px;font-size:14px;font-weight:600;cursor:pointer;border:none;display:inline-flex;align-items:center;gap:10px;transition:all 0.2s;text-decoration:none}
+.btn-primary:hover{background:goldenrod;transform:scale(1.02)}
+.btn-arrow{width:22px;height:22px;border-radius:50%;background:#000;display:flex;align-items:center;justify-content:center;font-size:11px}
+.hero-imgs{position:absolute;right:60px;bottom:80px;display:flex;gap:14px;opacity:0;animation:fadeIn 0.8s 0.8s forwards}
+
+/* SECTIONS */
+section{padding:100px 60px}
+.section-label{font-size:11px;letter-spacing:4px;text-transform:uppercase;color:rgba(255,255,255,0.25);display:flex;align-items:center;gap:10px;margin-bottom:48px}
+.section-label::before{content:'';width:6px;height:6px;border-radius:50%;background:rgba(255,255,255,0.25)}
+.section-label.dark{color:rgba(0,0,0,0.3)}
+.section-label.dark::before{background:rgba(0,0,0,0.25)}
+
+/* ABOUT US */
+.story-section{background:#f5f4f0;color:#000}
+.story-grid{display:grid;grid-template-columns:1fr 1fr;gap:80px;align-items:center}
+.story-title{font-size:clamp(36px,5vw,64px);font-weight:900;line-height:1;letter-spacing:-2px;margin-bottom:32px}
+.story-text{font-size:16px;color:rgba(0,0,0,0.55);line-height:1.85}
+.slider-image{border-radius:24px;overflow:hidden;background-size:contain;background-position:center;background-repeat:no-repeat; 
+        aspect-ratio:4/4;display:flex;align-items:center;justify-content:center;color:goldenrod;font-size:20px;letter-spacing:2px;text-transform:uppercase}
+.story-flags{display:flex;gap:8px;margin-top:24px;align-items:center}
+.flag-dot{width:28px;height:28px;border-radius:50%;background:#ccc;overflow:hidden;border:2px solid #fff}
+.story-reach{font-size:13px;color:rgba(0,0,0,0.45);margin-left:4px}
+.stats-row{display:grid;grid-template-columns:repeat(3,1fr);gap:1px;margin-top:64px;background:rgba(0,0,0,0.08);border-radius:20px;overflow:hidden}
+.stat-card{background:#f5f4f0;padding:36px;text-align:center}
+.stat-num{font-size:52px;font-weight:900;letter-spacing:-3px;color:#000;line-height:1}
+.stat-label{font-size:11px;color:rgba(0,0,0,0.4);letter-spacing:2px;text-transform:uppercase;margin-top:8px}
+.stat-sub{font-size:12px;color:rgba(0,0,0,0.35);margin-top:auto;line-height:1.4}
+
+/* SERVICES */
+.services-section{background:#0a0a0a}
+.services-header{display:flex;justify-content:space-between;align-items:flex-end;margin-bottom:48px}
+.services-title{background: linear-gradient(90deg,rgb(255, 237, 123), #F4E4A6, #ffffff);
+  background-clip: text;
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  font-size:clamp(36px,6vw,80px);font-weight:900;letter-spacing:-2px;line-height:1}
+.services-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:16px}
+.service-card{border:0.5px solid rgba(255,255,255,0.08);border-radius:20px;overflow:hidden;background:#111;transition:transform 0.3s cubic-bezier(0.16,1,0.3,1),border-color 0.3s;cursor:pointer}
+.service-card:hover{transform:translateY(-8px);border-color:rgba(255,255,255,0.2)}
+.slider-image.active{aspect-ratio:5/6;background-size:contain;width:100%;height:100%;background-position:center;background-repeat:no-repeat ;display:flex;align-items:center;justify-content:center;color:rgba(255,255,255,0.08);font-size:10px;letter-spacing:3px;text-transform:uppercase;position:relative;overflow:hidden}
+.service-img::after{content:'';position:absolute;inset:0;background:linear-gradient(to top,rgba(0,0,0,0.4) 0%,transparent 50%)}
+.service-info{padding:20px 22px}
+.service-name{font-size:20px;font-weight:600;margin-bottom:8px}
+.service-meta{display:flex;justify-content:space-between;align-items:center;font-size:13px;color:rgba(255,255,255,0.35)}
+.service-price{background: linear-gradient(90deg,rgb(255, 237, 123), #F4E4A6, #ffffff);
+  background-clip: text;
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  font-weight:500}
+
+/* our location */
+.franchise-section{background:#0a0a0a;padding:0}
+.franchise-inner{background:#111;border-radius:32px;margin:0 60px;padding:80px;display:grid;grid-template-columns:1fr 1fr;gap:60px;align-items:center;border:0.5px solid rgba(255,255,255,0.08)}
+.franchise-eyebrow{font-size:11px;letter-spacing:4px;text-transform:uppercase;color:rgba(255,255,255,0.25);margin-bottom:20px}
+.franchise-title{font-size:clamp(36px,4vw,54px);font-weight:900;letter-spacing:-2px;line-height:1;margin-bottom:24px}
+.franchise-text{font-size:15px;color:rgba(255,255,255,0.45);line-height:1.8;margin-bottom:16px}
+.franchise-year{font-size:clamp(80px,10vw,130px);font-weight:900;letter-spacing:-5px;color:rgba(238, 207, 3, 0.408);line-height:1;text-align:center}
+.map{
+    border-radius:20px;
+    overflow:hidden;
+}
+
+/* REVIEWS */
+.reviews-section{background:#f5f4f0;color:#000}
+.reviews-title{font-size:clamp(48px,8vw,100px);font-weight:900;letter-spacing:-4px;margin-bottom:12px;line-height:0.9}
+.reviews-sub{font-size:15px;color:rgba(0,0,0,0.45);max-width:480px;line-height:1.7;margin-bottom:48px}
+.review-card{background:#fff;border-radius:28px;padding:44px;display:grid;grid-template-columns:1fr 1fr;gap:44px;align-items:center;box-shadow:0 2px 40px rgba(0,0,0,0.06);transition:opacity 0.4s,transform 0.4s}
+.review-text{font-size:21px;font-weight:500;line-height:1.55;margin-bottom:24px;color:#111}
+.stars{color:#f59e0b;font-size:18px;letter-spacing:3px;margin-bottom:8px}
+.reviewer-name{font-size:13px;color:rgba(0,0,0,0.4);font-weight:500}
+.review-img{background-size:contain;width:100%;background-position:center;background-repeat:no-repeat;border-radius:18px;overflow:hidden;aspect-ratio:4/5;background:#e0ddd6;display:flex;align-items:center;justify-content:center;color:rgba(0,0,0,0.15);font-size:10px;letter-spacing:2px;text-transform:uppercase}
+.review-nav{display:flex;gap:12px;margin-top:28px}
+.rev-btn{width:46px;height:46px;border-radius:50%;border:1px solid rgba(0,0,0,0.12);background:transparent;cursor:pointer;font-size:16px;display:flex;align-items:center;justify-content:center;transition:all 0.2s}
+.rev-btn:hover{background:#000;color:#fff;border-color:#000}
+.review-dots{display:flex;gap:6px;margin-top:20px}
+.dot{width:6px;height:6px;border-radius:50%;background:rgba(0,0,0,0.15);transition:background 0.2s,width 0.2s}
+.dot.active{background:goldenrod;width:20px}
+
+/* AWARDS */
+.awards-section{background:#0a0a0a}
+.awards-title{font-size:clamp(48px,8vw,100px);font-weight:900;letter-spacing:-4px;margin-bottom:16px}
+.awards-sub{font-size:14px;color:rgba(255,255,255,0.35);max-width:440px;line-height:1.7;margin-bottom:56px}
+.awards-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:12px}
+.award-card{border:0.5px solid rgba(255,255,255,0.08);border-radius:16px;padding:28px 24px;background:#111;transition:border-color 0.2s}
+.award-card:hover{border-color:rgba(255,255,255,0.18)}
+.award-icon{font-size:28px;margin-bottom:16px}
+.award-name{font-size:14px;font-weight:600;margin-bottom:6px}
+.award-year{font-size:12px;color:rgba(255,255,255,0.35)}
+
+/* FAQ */
+.faq-section{background:#f5f4f0;color:#000}
+.faq-title{font-size:clamp(36px,6vw,72px);font-weight:900;letter-spacing:-3px;margin-bottom:48px;text-align:center}
+.faq-list{max-width:820px;margin:0 auto;display:flex;flex-direction:column;gap:8px}
+.faq-item{border:0.5px solid rgba(0,0,0,0.1);border-radius:16px;overflow:hidden;background:#fff;cursor:pointer;transition:border-color 0.2s}
+.faq-item:hover{border-color:rgba(0,0,0,0.2)}
+.faq-q{padding:22px 28px;font-size:16px;font-weight:500;display:flex;justify-content:space-between;align-items:center;user-select:none;color:#000}
+.faq-icon{width:30px;height:30px;border-radius:50%;border:0.5px solid rgba(0,0,0,0.12);display:flex;align-items:center;justify-content:center;font-size:18px;transition:transform 0.35s,background 0.2s;flex-shrink:0;color:rgba(0,0,0,0.5)}
+.faq-item.open .faq-icon{transform:rotate(45deg);background:#000;color:#fff;border-color:#000}
+.faq-a{max-height:0;overflow:hidden;transition:max-height 0.4s ease}
+.faq-item.open .faq-a{max-height:200px}
+.faq-a-inner{padding:0 28px 24px;font-size:14px;color:rgba(0,0,0,0.5);line-height:1.75}
+
+/* FOOTER */
+footer{background:#0a0a0a;padding:80px 60px 40px;border-top:0.5px solid rgba(255,255,255,0.06)}
+.footer-top{display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:72px}
+.footer-brand{font-size:12px;font-weight:700;letter-spacing:4px;text-transform:uppercase;margin-bottom:20px}
+.footer-contact a{display:block;color:rgba(255,255,255,0.4);font-size:14px;text-decoration:none;margin-bottom:8px;transition:color 0.2s}
+.footer-contact a:hover{color:#fff}
+.footer-address{font-size:12px;color:rgba(255,255,255,0.2);margin-top:16px;line-height:1.6}
+.footer-cols{display:flex;gap:80px}
+.footer-col-title{font-size:10px;letter-spacing:4px;text-transform:uppercase;color:rgba(255,255,255,0.2);margin-bottom:20px}
+.footer-links a{display:block;color:rgba(255,255,255,0.55);font-size:19px;font-weight:500;text-decoration:none;margin-bottom:10px;transition:color 0.2s}
+.footer-links a:hover{color:#fff}
+.footer-bottom{display:flex;justify-content:space-between;align-items:center;padding-top:32px;border-top:0.5px solid rgba(255,255,255,0.06)}
+.footer-copy{font-size:12px;color:rgba(255,255,255,0.2)}
+.footer-logo-big{font-size:clamp(48px,8vw,110px);font-weight:900;letter-spacing:-4px;color:rgba(193, 154, 0, 0.552);text-align:center;padding:40px 0 16px;pointer-events:none;line-height:1}
+
+/* SCROLL ANIMATIONS */
+.anim{opacity:0;transform:translateY(36px);transition:opacity 0.75s ease,transform 0.75s ease}
+.anim.in{opacity:1;transform:translateY(0)}
+.anim-d1{transition-delay:0.1s}
+.anim-d2{transition-delay:0.2s}
+.anim-d3{transition-delay:0.3s}
+.anim-d4{transition-delay:0.4s}
+
+@keyframes slideUp{to{opacity:1;transform:translateY(0)}}
+@keyframes fadeIn{to{opacity:1}}
+
+@media(max-width:900px){
+  nav{padding:16px 24px}
+  .nav-links{display:none}
+  section{padding:72px 24px}
+  .hero{padding:0 24px 64px}
+  .hero-imgs{display:none}
+  .hero-title{font-size:clamp(54px,14vw,100px)}
+  .hero-sub{flex-direction:column;gap:28px;align-items:flex-start}
+  .story-grid{grid-template-columns:1fr;gap:40px}
+  .services-grid{grid-template-columns:1fr 1fr}
+  .franchise-inner{margin:0 24px;padding:48px 32px;grid-template-columns:1fr;gap:32px}
+  .review-card{grid-template-columns:1fr}
+  .awards-grid{grid-template-columns:1fr 1fr}
+  .footer-top{flex-direction:column;gap:48px}
+  .footer-cols{gap:40px}
+}
+.slogan {
+    font-size: 50px;
+    background: linear-gradient(90deg, #B8860B, #F4E4A6, #D4AF37);
+    background-clip: text;
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+}
+.slider-image {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  box-shadow: 0 4px 12px rgba(187, 81, 0, 0.955); 
+  transition: opacity 0.4s ease, transform 6s ease; 
+}
+.slider-image.active {
+  transform: scale(1.1);
+}
+.service-card:hover .slider-image {
+  transform: scale(1.05); 
+}
+</style>
+</head>
+
+<body>
+
+<!-- NAV -->
+ 
+<nav id="navbar">
+  <button class="menu-toggle">☰</button>
+  <div class="nav-logo">
+    <img src="images/Ff.png" alt="logo"/>
+  </div>
+  
+  <div class="nav-links">
+    <a href="#home">HOME</a>
+    <a href="#story">ABOUT US</a>
+    <a href="#services">SERVICES</a>
+    <a href="#franchise">LOCATION</a>
+    <a href="#reviews">REVIEWS</a>
+    <a href="#faq">FAQ</a>
+  </div>
+  <a href="index.html" class="nav-cta">Book Now →</a>
+</nav>
+
+<!-- HERO -->
+<section class="hero" id="home">
+  <div class="hero-bg"></div>
+  <div class="hero-noise"></div>
+  <div class="hero-eyebrow">— current location:(spu) south Campus,Tauana Hall of residence</div>
+  <div class ="hero-eyebrow" style="animation-delay:0.3s">—south africa's #1 barbershop</div>
+  <h1 class="hero-title">
+    <span>MZANSI FADE #1<br>BARBERSHOP</span>
+    <span class="slogan">More Than a Haircut. It's Confidence.</span>
+  </h1>
+
+  <div class="hero-sub">
+    <div class="hero-tagline">Mzansi fades. Sharp styles. Real confidence.<br>At Mzansi Fade Barbershop,
+       we deliver precision fades, sharp cuts, and premium grooming services designed to keep you looking good.
+    </div>
+    <div class="hero-btns">
+      <a href="index(1).html" class="btn-outline">Haircut preview</a>
+      <a href="index(1).html" class="btn-primary">Book Now <span class="btn-arrow">→</span></a>
+    </div>
+</section>
+
+<!-- ABOUT US -->
+<section class="story-section" id="story">
+  <div class="section-label dark anim">ABOUT US</div>
+  <div class="story-grid">
+    <div> 
+      <h2 class="story-title anim">Mzansi Fade Barbershop was built on passion<br>skill, and a commitment to quality grooming</h2>
+      <p class="story-text anim anim-d1">From the beginning, the goal has been simple: deliver clean cuts, sharp fades, and excellent service that leaves every client looking and feeling their best.
+              Every haircut is approached with precision, attention to detail, and pride in the craft. Whether it's a classic cut, a modern fade, or beard grooming, Mzansi Fade Barbershop focuses on 
+              creating styles that match each client's personality and confidence.</p>
+      <p class="story-text anim anim-d2" style="margin-top:16px">More than just a place to get a haircut, Fresh Fade is a place where clients can relax, feel welcome, and trust that they're in capable hands.
+              We believe that a great haircut can make a lasting impression, and we're dedicated to helping our clients put their best foot forward every day.</p>
+        <div class="story-flags anim anim-d3">
+        <div class="flag-dot" style="background:goldenrod"></div>
+        <div class="flag-dot" style="background:black"></div>
+        <div class="flag-dot" style="background:goldenrod"></div>
+        <div class="flag-dot" style="background:black"></div>
+        <div class="flag-dot" style="background:goldenrod"></div>
+        <span class="story-reach">Mzansi Fade#1Barbershop — More Than a Haircut. It's Confidence.</span>
+      </div>
+    </div>
+    <div class="service-card anim anim-d1">
+      <div class="slider">
+      <img class="slider-image" src="images/br3.jpg" alt="story image"
+      data-images="images/br2.jpg,images/br1.jpg,images/cut4.jpeg,images/r1.jpeg,images/br4.jpg,images/u1.jpeg,images/u5.jpeg"/>
+      </div>
+    </div>
+    
+  </div>
+  <div class="stats-row anim">
+    <div class="stat-card">
+      <div class="stat-num">5k+</div>
+      <div class="stat-label">Happy Customers</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-num">100+ satisfied clients</div>
+      <div class="stat-label">Trusted by students across SPU.</div>
+      <div class="stat-sub"><br>Current location:<br>south Campus,<br>Tauna Hall of residence</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-num">5+</div>
+      <div class="stat-label">Years of experience</div>
+      <div class="stat-sub">Over 5 years of excellent cuts.</div>
+    </div>
+  </div>
+</section>
+
+<!-- SERVICES -->
+<div class="services-section" id="services">
+  <div class="section-label anim">Our Services</div>
+  <div class="services-header">
+    <h2 class="services-title anim">We give over +/-20<br>haircuts.</h2>
+    <a href="index(1).html" class="btn-primary anim">Book Now <span class="btn-arrow">→</span></a>
+  </div>
+
+  <div class="services-grid">
+    <div class="service-card anim">
+      <div class="slider">
+      <img class="slider-image" src="images/br2.heic" alt="service image"
+      data-images="images/u1.jpeg,images/u2.jpeg,images/u3.jpeg,images/u4.jpeg,images/u5.jpeg"/>
+      <div class="service-info">
+        <div class="service-name">brush cut</div>
+        <div class="service-meta"><span>+/- 40 minutes</span><span class="service-price">R50 & R80 with Dye</span></div>
+      </div>
+  </div>
+</div>
+
+    <div class="service-card anim anim-d1">
+      <div class="slider">
+      <img class="slider-image" src="images/cut.jpeg" alt="service image"
+      data-images="images/cut1.jpeg,images/cut2.jpeg,images/cut3.jpeg,images/cut4.jpeg,images/cut5.jpeg,images/cut6.jpeg,images/cut7.jpeg"/>
+      <div class="service-info">
+        <div class="service-name">cut<br>(low fade)*(midle fade)*(high fade)</div>
+        <div class="service-meta"><span>+/- 40 minutes</span><span class="service-price">R50 & R80 with Dye</span></div>
+       </div>
+      </div>
+    </div>
+
+    <div class="service-card anim anim-d2">
+      <div class="slider">
+      <img class="slider-image" src="images/t1.jpeg" alt="service image"
+      data-images="images/t2.jpeg,images/t3.jpeg,images/tp.jpg,images/tp1.jpg,images/tp2.jpg"/>
+      <div class="service-info">
+        <div class="service-name">Taper<br>(low fade)*(midle fade)*(high fade)</div>
+        <div class="service-meta"><span>+/- 40 minutes</span><span class="service-price">R50 & R80 with Dye</span></div>
+      </div>
+    </div>
+  </div>
+
+    <div class="service-card anim anim-d1">
+      <div class="slider">
+      <img class="slider-image" src="images/yy.jpg" alt="service image"
+      data-images="images/f1.jpeg,images/f2.jpeg,images/f3.jpeg,images/f4.jpeg,images/f5.jpeg"/>
+      <div class="service-info">
+        <div class="service-name">Brush & lower hair</div>
+        <div class="service-meta"><span>+/- 40 minutes</span><span class="service-price">R30 & R60 with Dye</span></div>
+      </div>
+    </div>
+  </div>
+
+    <div class="service-card anim anim-d2">
+      <div class="slider">
+      <img class="slider-image" src="images/m.jpg" alt="service image"
+      data-images="images/m5.jpg,images/m2.jpg,images/m6.jpg,images/m.jpg"/>
+      <div class="service-info">
+        <div class="service-name">Mohawk</div>
+        <div class="service-meta"><span>+/- 40 minutes</span><span class="service-price">R50 & R80 with Dye</span></div>
+      </div>
+    </div>
+  </div>
+
+    <div class="service-card anim">
+      <div class="slider">
+      <img class="slider-image" src="images/br3.jpg" alt="service image"
+      data-images="images/f5.jpeg,images/u1.jpeg,images/cut.jpeg,images/c1.jpeg,images/u3.jpeg"/>
+      <div class="service-info">
+        <div class="service-name">Triming</div>
+        <div class="service-meta"><span>+/- 20 minutes</span><span class="service-price">R15</span></div>
+      </div>
+    </div>
+  </div>
+</div>
+</div>
+
+
+<!--OUR LOCATION -->
+<section style="background:#0a0a0a;padding:0 0 100px" id="franchise">
+  <div class="franchise-inner anim">
+    <div>
+      <div class="franchise-eyebrow"> South Campus's Trusted Barbershop</div>
+      <h2 class="franchise-title">Mzansi Fade Barbershop is proudly located at South Campus</h2>
+      <p class="franchise-text">Fresh Fade Barbershop provides quality haircuts, beard grooming, and modern styling for students. Our goal is to help every customer look sharp and leave with confidence.</p>
+      <p class="franchise-text">we offer a welcoming environment, skilled barbers, and affordable services designed to keep you looking your best.</p>
+      <a href="#story" class="btn-primary" style="margin-top:8px"> Learn More About Mzansi Fade <span class="btn-arrow">→</span></a>
+    </div>
+<div class="map">
+  <iframe src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d2331.7575587598376!2d24.758165291166897!3d-28.755612298311448!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.
+            1!3m3!1m2!1s0x1e9b1a4b17e3b78d%3A0xbe02e522cb5e0092!2s22%20Birbeck%20Ave%2C%20New%20Park%2C%20Kimberley%2C%208301!5e1!3m2!1sen!2sza!4v1781996063486!5m2!1sen!2sza" 
+            width="600" height="530" style="border:0;" allowfullscreen="" loading="lazy" referrerpolicy="no-referrer-when-downgrade"></iframe>
+</div>
+  <div class="franchise-year">2026</div>
+    <img src="images/Ff.png"width="200px" height="130px" alt="logo"/>
+    </div>
+  </div>
+</section>
+
+<!-- REVIEWS -->
+<section class="reviews-section" id="reviews">
+  <div class="section-label dark anim">Our Client Testimonials</div>
+  <h2 class="reviews-title anim">Reviews</h2>
+  <p class="reviews-sub anim anim-d1">Fresh cuts. Real people. Honest reviews. See why clients keep coming back to Mzansi Fade Barbershop.</p>
+  <div class="review-card anim" id="reviewCard">
+    <div>
+      <p class="review-text" id="reviewText">"Excellent service, friendly staff, and one of the best haircuts I've had. Mzansi Fade Barbershop never disappoints."</p>
+      <div class="stars" id="reviewStars">★★★★★</div>
+      <p class="reviewer-name" id="reviewName">— mpho M.</p>
+      <div class="review-nav">
+        <button class="rev-btn" onclick="prevReview()" aria-label="Previous review">←</button>
+        <button class="rev-btn" onclick="nextReview()" aria-label="Next review">→</button>
+      </div>
+      <div class="review-dots" id="reviewDots"></div>
+    </div>
+    <img id="reviewImage" src="images/cut3.jpeg" alt="review image" class="review-img"/>
+  </div>
+</section>
+
+<!-- SOCIAL MEDIA -->
+<section class="awards-section" id="awards">
+  <div class="section-label anim">stay connected</div>
+  <h2 class="awards-title anim">Follow Mzansi Fade Barbershop</h2>
+  <p class="awards-sub anim anim-d1">Follow us on social media to see our latest haircuts, special offers, and updates.
+  </p></p>
+  <div class="awards-grid">
+    <div class="award-card anim">
+      <div class="award-icon">📷</div>
+      <div class="award-name">Instagram</div>
+      <div class="award-year">fresh_fade_mzansiBarber</div>
+    </div>
+    <div class="award-card anim anim-d1">
+      <div class="award-icon">📘</div>
+      <div class="award-name">Facebook</div>
+      <div class="award-year">FreshFade MzansiBarbershop</div>
+    </div>
+    <div class="award-card anim anim-d2">
+      <div class="award-icon">🎵</div>
+      <div class="award-name">TikTok</div>
+      <div class="award-year">Fresh_Fade_Mzansi1barber</div>
+    </div>
+    <div class="award-card anim anim-d3">
+      <div class="award-icon">🐦</div>
+      <div class="award-name">X/twitter</div>
+      <div class="award-year">Mzansi Fade#1barbershop</div>
+    </div>
+  </div>
+</section>
+
+<!-- FAQ -->
+<section class="faq-section" id="faq">
+<h2 class="faq-title anim">Frequently Asked Questions</h2>
+  <div class="faq-list">
+    <div class="faq-item anim" onclick="toggleFaq(this)">
+      <div class="faq-q">How much is a haircut? <span class="faq-icon">+</span></div>
+      <div class="faq-a"><div class="faq-a-inner">Our standard haircut starts from R30 to R80. Click 'Book Now' to see all the hairstyles we're offering and their current pricing.</div></div>
+    </div>
+    <div class="faq-item anim anim-d1" onclick="toggleFaq(this)">
+      <div class="faq-q">Can I book for a haircut? <span class="faq-icon">+</span></div>
+      <div class="faq-a"><div class="faq-a-inner">Yes! You can book through DM on whatsApp /call on this numbers {063 186 2368}  and also by clicking the 'Book Now' button on this page. Walk-ins are also welcome at TAUANA(SPU).</div></div> 
+    </div>
+    <div class="faq-item anim anim-d2" onclick="toggleFaq(this)">
+      <div class="faq-q">Where are you located? <span class="faq-icon">+</span></div>
+      <div class="faq-a"><div class="faq-a-inner">our current location is at (SPU),South Campus in Tauana hall of recidence * KINDLY NOTE:The location may change! but we will make sure to inform you when we change it,Check our social meadia platforms and also this website for latest updates*</div></div>
+    </div>
+    <div class="faq-item anim" onclick="toggleFaq(this)">
+      <div class="faq-q">Do you operate durring the week? <span class="faq-icon">+</span></div>
+      <div class="faq-a"><div class="faq-a-inner">Mostly durring the week we do not operate we mostly open on weekends from FRIDAY to SUNDAY and also durring HOLIDAYS *opening time{10am - 6pm}*— we're always growing!</div></div>
+    </div>
+    <div class="faq-item anim anim-d1" onclick="toggleFaq(this)">
+      <div class="faq-q">Do you do house calls? <span class="faq-icon">+</span></div>
+      <div class="faq-a"><div class="faq-a-inner">yes we do house call KINDLY NOTE:extra fee depands on the location. Check our social meadia platforms and also this website for the latest updates — we're always growing!</div></div>
+    </div>
+    <div class="faq-item anim anim-d2" onclick="toggleFaq(this)">
+  </div>
+</section>
+
+<!-- FOOTER -->
+<footer>
+  <div class="footer-top">
+    <div class="footer-brand-block">
+      <div class="footer-brand">Mzansi Fade#1Barbershop/div>
+      <div class="footer-contact">
+        <a href="mailto:freshfademzansibabershop@gmail.com">freshfademzansibabershop@gmail.com</a>
+        <a href="tel:+27631862368">+27 63 186 2368</a>
+      </div>
+      <div class="footer-address">South Campus(SPU)<br>kimberly<br>Northern Cape;South Africa</div>
+    </div>
+    <div class="footer-cols">
+      <div>
+        <div class="footer-col-title">Navigation</div>
+        <div class="footer-links">
+          <a href="#home">Home</a>
+          <a href="haircut preview tool.html">BOOK Now</a>
+          <a href="#story">About Us</a>
+          <a href="#services">Our Services</a>
+          <a href="#franchise">Location</a>
+          <a href="#reviews">Reviews</a>
+                </div>
+      </div>
+      <div>
+        <div class="footer-col-title">Social Media</div>
+        <div class="footer-links">
+          <a href="http://www.tiktok.com/@fresh_fade_mzansi1baber">TikTok</a>
+          <a href="https://www.instagram.com/mzansi_fade_barbershop?igsh=MW1jYnVpczJubXk5aA%3D%3D&utm_source=qr">Instagram</a>
+          <a href="https://www.facebook.com/share/1BDaeySwDA/?mibextid=wwXIfr">Facebook</a>
+          <a href="https://x.com/mzansifade?s=11">X.com</a>
+          </div>
+      </div>
+    </div>
+  </div>
+  <div class="footer-bottom">
+    <span class="footer-copy">©2026 Mzansi Fade#1Barbershop. All Rights Reserved.</span>
+    <span class="footer-copy">Built with love.</span>
+    <span class="footer-copy">By--Hluvuko.</span>
+  </div>
+  <div class="footer-logo-big">MzansiFade<br>#1Barbershop
+<img src="images/Ff.png" width="300px" height="200px" alt="logo"/>
+  </div>
+  </div>
+   
+</footer>
+
+
+<script>
+// Navbar shrink on scroll
+window.addEventListener('scroll',()=>{
+  document.getElementById('navbar').classList.toggle('scrolled',window.scrollY>60);
+});
+
+// Scroll animations
+const obs=new IntersectionObserver((entries)=>{
+  entries.forEach(e=>{if(e.isIntersecting){e.target.classList.add('in');obs.unobserve(e.target)}});
+},{threshold:0.12});
+document.querySelectorAll('.anim').forEach(el=>obs.observe(el));
+
+//  slides images
+
+const images = document.querySelectorAll(".slider-image");
+images.forEach((img) => {
+  const list = img.dataset.images.split(",").map(i => i.trim());
+  let index = 0;
+  let interval;
+
+  function start() {
+    interval = setInterval(() => {
+      index = (index + 1) % list.length;
+      img.style.opacity = 0;
+      setTimeout(() => {
+        img.src = list[index];
+        img.style.opacity = 1;
+      }, 300);
+    }, 3000);
+  }
+
+  function stop() {
+    clearInterval(interval);
+  }
+
+  img.addEventListener("mouseenter", stop);
+  img.addEventListener("mouseleave", start);
+
+  start();
+  img.style.transition = "opacity 0.8s ease";
+});
+
+
+// Reviews
+const reviews = [
+  {
+    text:'"Mzansi Fade Barbershop gave me one of the cleanest fades I have ever had. The barber listened to exactly what I wanted and delivered beyond my expectations."',
+    name:'— T Man.',
+    stars:'★★★★★',
+    image: "images/r1.jpeg",
+  },
+  {
+    text:'"I booked my appointment online and everything went smoothly. The atmosphere is relaxed and the barber is highly skilled."',
+    name:'—Mpho  .',
+    stars:'★★★★★',
+    image: "images/f2.jpeg"
+  },
+  {
+    text:'"Affordable prices, excellent customer service, and a haircut that exceeded my expectations. Highly recommended."',
+    name:'— Kgontse.',
+    stars:'★★★★★',
+    image: "images/cut1.jpeg"
+  },
+  {
+    text:'"I have tried many barbershops, but Fresh Fade is by far my favourite. Consistent quality every single time."',
+    name:'— Kamu.',
+    stars:'★★★★★',
+    image: "images/t3.jpeg"
+  }
+];
+
+let ri = 0;
+
+function buildDots(){
+  const d=document.getElementById('reviewDots');
+  d.innerHTML='';
+  reviews.forEach((_,i)=>{
+    const dot=document.createElement('div');
+    dot.className='dot'+(i===ri?' active':'');
+    dot.onclick=()=>{ri=i;showReview()};
+    d.appendChild(dot);
+  });
+}
+
+function showReview(){
+  const c=document.getElementById('reviewCard');
+  c.style.opacity='0';c.style.transform='translateX(20px)';
+  setTimeout(()=>{
+    const r=reviews[ri];
+    document.getElementById('reviewText').textContent=r.text;
+    document.getElementById('reviewName').textContent=r.name;
+    document.getElementById('reviewStars').textContent=r.stars;
+    document.getElementById('reviewImage').src=r.image;
+    buildDots();
+    c.style.transition='opacity 0.45s,transform 0.45s';
+    c.style.opacity='1';c.style.transform='translateX(0)';
+  },50);
+}
+
+function nextReview(){ri=(ri+1)%reviews.length;showReview()}
+function prevReview(){ri=(ri-1+reviews.length)%reviews.length;showReview()}
+
+buildDots();
+
+// FAQ
+function toggleFaq(el){
+  const isOpen=el.classList.contains('open');
+  document.querySelectorAll('.faq-item').forEach(i=>i.classList.remove('open'));
+  if(!isOpen)el.classList.add('open');
+}
+
+const toggle = document.querySelector('.menu-toggle');
+  const navLinks = document.querySelector('.nav-links');
+
+  toggle.addEventListener('click', () => {
+    navLinks.classList.toggle('show');
+  });
+</script>
+</body>
+</html>
